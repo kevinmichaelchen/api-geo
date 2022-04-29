@@ -22,19 +22,17 @@ func main() {
 
 	ctx := context.Background()
 
-	geoRes1, err := geocoding.ReverseGeocode(ctx, c, officeLat, officeLng)
+	office, err := geocoding.ReverseGeocode(ctx, c, officeLat, officeLng)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pretty.Println(geoRes1[0])
 
-	geoRes2, err := geocoding.ReverseGeocode(ctx, c, restaurantLat, restaurantLng)
+	restaurant, err := geocoding.ReverseGeocode(ctx, c, restaurantLat, restaurantLng)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pretty.Println(geoRes2[0])
 
-	res, err := distance.BetweenPlaces(ctx, c, geoRes1[0].ID, geoRes2[0].ID)
+	res, err := distance.BetweenPlaces(ctx, c, office.GetResults()[0].GetPlaceId(), restaurant.GetResults()[0].GetPlaceId())
 	if err != nil {
 		log.Fatal(err)
 	}

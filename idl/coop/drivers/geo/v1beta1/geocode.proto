@@ -19,5 +19,74 @@ message ReverseGeocodeRequest {
 }
 
 message ReverseGeocodeResponse {
-  string place_id = 1;
+  repeated GeocodingResult results = 1;
+}
+
+// GeocodingResult is a single geocoded address
+message GeocodingResult {
+  // An array containing the separate components applicable to this address.
+  repeated AddressComponent address_components = 1;
+  // A string containing the human-readable address of this location.
+  string formatted_address = 2;
+  AddressGeometry address_geometry = 3;
+  // Contains a set of zero or more tags identifying the type of feature
+  // returned in the result. For example, a geocode of "Chicago" returns
+  // "locality" which indicates that "Chicago" is a city, and also returns
+  // "political" which indicates it is a political entity.
+  repeated string types = 4;
+  // A unique identifier that can be used with other Google APIs.
+  string place_id = 5;
+}
+
+enum LocationType {
+  LOCATION_TYPE_INVALID = 0;
+  // Indicates that the returned result is a precise geocode for which we have
+  // location information accurate down to street address precision.
+  LOCATION_TYPE_ROOFTOP = 1;
+  // Indicates that the returned result reflects an approximation (usually on a
+  // road) interpolated between two precise points (such as intersections).
+  // Interpolated results are generally returned when rooftop geocodes are
+  // unavailable for a street address.
+  LOCATION_TYPE_RANGE_INTERPOLATED = 2;
+  // Indicates that the returned result is the geometric center of a result such
+  // as a polyline (for example, a street) or polygon (region).
+  LOCATION_TYPE_GEOMETRIC_CENTER = 3;
+  // Indicates that the returned result is approximate.
+  LOCATION_TYPE_APPROXIMATE = 4;
+}
+
+// LatLngBounds represents a bounded square area on the Earth.
+message LatLngBounds {
+  LatLng northeast = 1;
+  LatLng southwest = 2;
+}
+
+// AddressGeometry is the location of a an address
+message AddressGeometry {
+  // Contains the geocoded latitude, longitude value. For normal address
+  // lookups, this field is typically the most important.
+  LatLng location = 1;
+  // Stores additional data about the specified location.
+  LocationType location_type = 2;
+  // Stores the bounding box which can fully contain the returned result. Note
+  // that these bounds may not match the recommended viewport. (For example, San
+  // Francisco includes the Farallon islands, which are technically part of the
+  // city, but probably should not be returned in the viewport.)
+  // (Optionally returned).
+  LatLngBounds bounds = 3;
+  // Contains the recommended viewport for displaying the returned result,
+  // specified as two latitude,longitude values defining the southwest and
+  // northeast corner of the viewport bounding box. Generally the viewport is
+  // used to frame a result when displaying it to a user.
+  LatLngBounds viewport = 4;
+  repeated string types = 5;
+}
+
+// AddressComponent is a part of an address
+message AddressComponent {
+  string long_name = 1;
+  string short_name = 2;
+  // See supported types:
+  // https://developers.google.com/maps/documentation/places/web-service/supported_types
+  repeated string types = 3;
 }
