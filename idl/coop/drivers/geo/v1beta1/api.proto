@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package coop.drivers.geo.v1beta1;
 
-option go_package = "github.com/kevinmichaelchen/api-geo/internal/api/coop/drivers/geo/v1beta1";
+option go_package = "github.com/kevinmichaelchen/api-geo/internal/idl/coop/drivers/geo/v1beta1";
 
-import "google/protobuf/duration.proto";
+import "coop/drivers/geo/v1beta1/geocode.proto";
+import "coop/drivers/geo/v1beta1/distance.proto";
 
 service GeoService {
   // Convert address to geographic coordinates
@@ -13,43 +14,4 @@ service GeoService {
   rpc ReverseGeocode(ReverseGeocodeRequest) returns (ReverseGeocodeResponse) {}
   // Get distance between two places
   rpc GetDistance(GetDistanceRequest) returns (GetDistanceResponse) {}
-}
-
-// An object that represents a latitude/longitude pair. This is expressed as a
-// pair of doubles to represent degrees latitude and degrees longitude. Unless
-// specified otherwise, this must conform to the
-// <a href="http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf">WGS84
-// standard</a>. Values must be within normalized ranges.
-message LatLng {
-  // The latitude in degrees. It must be in the range [-90.0, +90.0].
-  double latitude = 1;
-
-  // The longitude in degrees. It must be in the range [-180.0, +180.0].
-  double longitude = 2;
-}
-
-message GeocodeRequest {
-  string place_id = 1;
-}
-
-message GeocodeResponse {
-  LatLng lat_lng = 1;
-}
-
-message ReverseGeocodeRequest {
-  LatLng lat_lng = 1;
-}
-
-message ReverseGeocodeResponse {
-  string place_id = 1;
-}
-
-message GetDistanceRequest {
-  string place_1_id = 1;
-  string place_2_id = 2;
-}
-
-message GetDistanceResponse {
-  google.protobuf.Duration duration = 1;
-  int32 distance_meters = 2;
 }

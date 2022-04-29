@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package coop.drivers.geo.v1beta1;
+
+option go_package = "github.com/kevinmichaelchen/api-geo/internal/idl/coop/drivers/geo/v1beta1";
+
+import "google/protobuf/duration.proto";
+
+message GetDistanceRequest {
+  string place_1_id = 1;
+  string place_2_id = 2;
+}
+
+message GetDistanceResponse {
+  google.protobuf.Duration duration = 1;
+  int32 distance_meters = 2;
+}

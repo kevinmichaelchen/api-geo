@@ -18,8 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GeoServiceClient interface {
-	// Convert coordinates to Place ID
-	GetPlace(ctx context.Context, in *GetPlaceRequest, opts ...grpc.CallOption) (*GetPlaceResponse, error)
+	// Convert address to geographic coordinates
+	Geocode(ctx context.Context, in *GeocodeRequest, opts ...grpc.CallOption) (*GeocodeResponse, error)
+	// Convert geographic coordinates to address/place
+	ReverseGeocode(ctx context.Context, in *ReverseGeocodeRequest, opts ...grpc.CallOption) (*ReverseGeocodeResponse, error)
 	// Get distance between two places
 	GetDistance(ctx context.Context, in *GetDistanceRequest, opts ...grpc.CallOption) (*GetDistanceResponse, error)
 }
@@ -32,9 +34,18 @@ func NewGeoServiceClient(cc grpc.ClientConnInterface) GeoServiceClient {
 	return &geoServiceClient{cc}
 }
 
-func (c *geoServiceClient) GetPlace(ctx context.Context, in *GetPlaceRequest, opts ...grpc.CallOption) (*GetPlaceResponse, error) {
-	out := new(GetPlaceResponse)
-	err := c.cc.Invoke(ctx, "/coop.drivers.geo.v1beta1.GeoService/GetPlace", in, out, opts...)
+func (c *geoServiceClient) Geocode(ctx context.Context, in *GeocodeRequest, opts ...grpc.CallOption) (*GeocodeResponse, error) {
+	out := new(GeocodeResponse)
+	err := c.cc.Invoke(ctx, "/coop.drivers.geo.v1beta1.GeoService/Geocode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *geoServiceClient) ReverseGeocode(ctx context.Context, in *ReverseGeocodeRequest, opts ...grpc.CallOption) (*ReverseGeocodeResponse, error) {
+	out := new(ReverseGeocodeResponse)
+	err := c.cc.Invoke(ctx, "/coop.drivers.geo.v1beta1.GeoService/ReverseGeocode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +65,10 @@ func (c *geoServiceClient) GetDistance(ctx context.Context, in *GetDistanceReque
 // All implementations should embed UnimplementedGeoServiceServer
 // for forward compatibility
 type GeoServiceServer interface {
-	// Convert coordinates to Place ID
-	GetPlace(context.Context, *GetPlaceRequest) (*GetPlaceResponse, error)
+	// Convert address to geographic coordinates
+	Geocode(context.Context, *GeocodeRequest) (*GeocodeResponse, error)
+	// Convert geographic coordinates to address/place
+	ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error)
 	// Get distance between two places
 	GetDistance(context.Context, *GetDistanceRequest) (*GetDistanceResponse, error)
 }
@@ -64,8 +77,11 @@ type GeoServiceServer interface {
 type UnimplementedGeoServiceServer struct {
 }
 
-func (UnimplementedGeoServiceServer) GetPlace(context.Context, *GetPlaceRequest) (*GetPlaceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPlace not implemented")
+func (UnimplementedGeoServiceServer) Geocode(context.Context, *GeocodeRequest) (*GeocodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Geocode not implemented")
+}
+func (UnimplementedGeoServiceServer) ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReverseGeocode not implemented")
 }
 func (UnimplementedGeoServiceServer) GetDistance(context.Context, *GetDistanceRequest) (*GetDistanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDistance not implemented")
@@ -82,20 +98,38 @@ func RegisterGeoServiceServer(s grpc.ServiceRegistrar, srv GeoServiceServer) {
 	s.RegisterService(&GeoService_ServiceDesc, srv)
 }
 
-func _GeoService_GetPlace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPlaceRequest)
+func _GeoService_Geocode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GeocodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GeoServiceServer).GetPlace(ctx, in)
+		return srv.(GeoServiceServer).Geocode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/coop.drivers.geo.v1beta1.GeoService/GetPlace",
+		FullMethod: "/coop.drivers.geo.v1beta1.GeoService/Geocode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GeoServiceServer).GetPlace(ctx, req.(*GetPlaceRequest))
+		return srv.(GeoServiceServer).Geocode(ctx, req.(*GeocodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GeoService_ReverseGeocode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReverseGeocodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GeoServiceServer).ReverseGeocode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/coop.drivers.geo.v1beta1.GeoService/ReverseGeocode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GeoServiceServer).ReverseGeocode(ctx, req.(*ReverseGeocodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -126,8 +160,12 @@ var GeoService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GeoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetPlace",
-			Handler:    _GeoService_GetPlace_Handler,
+			MethodName: "Geocode",
+			Handler:    _GeoService_Geocode_Handler,
+		},
+		{
+			MethodName: "ReverseGeocode",
+			Handler:    _GeoService_ReverseGeocode_Handler,
 		},
 		{
 			MethodName: "GetDistance",
@@ -135,5 +173,5 @@ var GeoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "idl/coop/drivers/geo/v1beta1/api.proto",
+	Metadata: "coop/drivers/geo/v1beta1/api.proto",
 }

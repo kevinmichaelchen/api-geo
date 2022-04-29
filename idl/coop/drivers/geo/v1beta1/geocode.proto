@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package coop.drivers.geo.v1beta1;
+
+option go_package = "github.com/kevinmichaelchen/api-geo/internal/idl/coop/drivers/geo/v1beta1";
+
+import "coop/drivers/geo/v1beta1/latlng.proto";
+
+message GeocodeRequest {
+  string place_id = 1;
+}
+
+message GeocodeResponse {
+  LatLng lat_lng = 1;
+}
+
+message ReverseGeocodeRequest {
+  LatLng lat_lng = 1;
+}
+
+message ReverseGeocodeResponse {
+  string place_id = 1;
+}
