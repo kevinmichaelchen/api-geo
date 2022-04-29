@@ -23,7 +23,7 @@ type GeoServiceClient interface {
 	// Convert geographic coordinates to address/place
 	ReverseGeocode(ctx context.Context, in *ReverseGeocodeRequest, opts ...grpc.CallOption) (*ReverseGeocodeResponse, error)
 	// Get distance between two places
-	GetDistance(ctx context.Context, in *GetDistanceRequest, opts ...grpc.CallOption) (*GetDistanceResponse, error)
+	DistanceMatrix(ctx context.Context, in *DistanceMatrixRequest, opts ...grpc.CallOption) (*DistanceMatrixResponse, error)
 }
 
 type geoServiceClient struct {
@@ -52,9 +52,9 @@ func (c *geoServiceClient) ReverseGeocode(ctx context.Context, in *ReverseGeocod
 	return out, nil
 }
 
-func (c *geoServiceClient) GetDistance(ctx context.Context, in *GetDistanceRequest, opts ...grpc.CallOption) (*GetDistanceResponse, error) {
-	out := new(GetDistanceResponse)
-	err := c.cc.Invoke(ctx, "/coop.drivers.geo.v1beta1.GeoService/GetDistance", in, out, opts...)
+func (c *geoServiceClient) DistanceMatrix(ctx context.Context, in *DistanceMatrixRequest, opts ...grpc.CallOption) (*DistanceMatrixResponse, error) {
+	out := new(DistanceMatrixResponse)
+	err := c.cc.Invoke(ctx, "/coop.drivers.geo.v1beta1.GeoService/DistanceMatrix", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ type GeoServiceServer interface {
 	// Convert geographic coordinates to address/place
 	ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error)
 	// Get distance between two places
-	GetDistance(context.Context, *GetDistanceRequest) (*GetDistanceResponse, error)
+	DistanceMatrix(context.Context, *DistanceMatrixRequest) (*DistanceMatrixResponse, error)
 }
 
 // UnimplementedGeoServiceServer should be embedded to have forward compatible implementations.
@@ -83,8 +83,8 @@ func (UnimplementedGeoServiceServer) Geocode(context.Context, *GeocodeRequest) (
 func (UnimplementedGeoServiceServer) ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReverseGeocode not implemented")
 }
-func (UnimplementedGeoServiceServer) GetDistance(context.Context, *GetDistanceRequest) (*GetDistanceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDistance not implemented")
+func (UnimplementedGeoServiceServer) DistanceMatrix(context.Context, *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DistanceMatrix not implemented")
 }
 
 // UnsafeGeoServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -134,20 +134,20 @@ func _GeoService_ReverseGeocode_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GeoService_GetDistance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDistanceRequest)
+func _GeoService_DistanceMatrix_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DistanceMatrixRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GeoServiceServer).GetDistance(ctx, in)
+		return srv.(GeoServiceServer).DistanceMatrix(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/coop.drivers.geo.v1beta1.GeoService/GetDistance",
+		FullMethod: "/coop.drivers.geo.v1beta1.GeoService/DistanceMatrix",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GeoServiceServer).GetDistance(ctx, req.(*GetDistanceRequest))
+		return srv.(GeoServiceServer).DistanceMatrix(ctx, req.(*DistanceMatrixRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,8 +168,8 @@ var GeoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GeoService_ReverseGeocode_Handler,
 		},
 		{
-			MethodName: "GetDistance",
-			Handler:    _GeoService_GetDistance_Handler,
+			MethodName: "DistanceMatrix",
+			Handler:    _GeoService_DistanceMatrix_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

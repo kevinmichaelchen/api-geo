@@ -13,5 +13,5 @@ service GeoService {
   // Convert geographic coordinates to address/place
   rpc ReverseGeocode(ReverseGeocodeRequest) returns (ReverseGeocodeResponse) {}
   // Get distance between two places
-  rpc GetDistance(GetDistanceRequest) returns (GetDistanceResponse) {}
+  rpc DistanceMatrix(DistanceMatrixRequest) returns (DistanceMatrixResponse) {}
 }

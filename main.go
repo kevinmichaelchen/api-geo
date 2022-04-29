@@ -32,7 +32,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	res, err := distance.BetweenPlaces(ctx, c, office.GetResults()[0].GetPlaceId(), restaurant.GetResults()[0].GetPlaceId())
+	res, err := distance.BetweenPlaces(ctx, c,
+		office.GetResults()[0].GetPlaceId(),
+		restaurant.GetResults()[0].GetPlaceId(),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
